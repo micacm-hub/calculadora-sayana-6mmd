@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Sayana Press + 6MMD</title>
+<style>
+:root{
+  --bg:#f4f6f8; --card:#fff; --text:#20323f; --muted:#60717d;
+  --blue:#23476d; --blue2:#eaf1f8; --orange:#d76600; --orange2:#fff1e6;
+  --green:#176b55; --border:#d7e0e6;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--text)}
+.wrap{max-width:680px;margin:0 auto;padding:18px 14px 42px}
+.head{padding:14px 4px}
+.tag{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--blue)}
+h1{font-size:27px;line-height:1.15;margin:5px 0 8px}
+.intro{margin:0;color:var(--muted);font-size:15px;line-height:1.45}
+.card{background:var(--card);border:1px solid var(--border);border-radius:17px;padding:17px;margin-top:14px;box-shadow:0 4px 16px rgba(0,0,0,.04)}
+.choice{display:block;padding:12px;border:1px solid var(--border);border-radius:12px;margin:9px 0;cursor:pointer;line-height:1.35}
+.choice input{margin-right:8px}
+.choice strong{display:block;margin-left:25px;margin-top:-18px}
+.choice span{display:block;color:var(--muted);font-size:13px;margin:4px 0 0 25px}
+.fields{display:none;margin-top:15px;border-top:1px solid var(--border);padding-top:15px}
+.fields.show{display:block}
+label.field-label{display:block;font-size:14px;font-weight:800;margin:12px 0 7px}
+input[type=date]{width:100%;padding:13px;border:1px solid #bccbd4;border-radius:11px;font-size:16px;background:#fff;min-height:48px}
+button{width:100%;margin-top:16px;padding:14px;border:0;border-radius:12px;font-size:16px;font-weight:800;background:var(--blue);color:white;cursor:pointer}
+.result{display:none}.result.show{display:block}
+.banner{border-radius:13px;padding:14px;margin-bottom:12px}
+.banner.orange{background:var(--orange2);border:1px solid #f2c79f}
+.banner.blue{background:var(--blue2);border:1px solid #c7d9ea}
+.banner .small{font-size:12px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.banner .big{font-size:20px;font-weight:800;line-height:1.25}
+.row{padding:13px 0;border-top:1px solid var(--border)}
+.row .lbl{font-size:12px;text-transform:uppercase;font-weight:800;color:var(--muted);margin-bottom:4px}
+.row .val{font-size:16px;font-weight:700;line-height:1.4}
+.date{color:var(--green)}
+.alert{background:#fff7e0;border:1px solid #edd797;border-radius:12px;padding:12px;font-size:14px;line-height:1.4;margin-top:10px}
+.stop{background:#fdecea;border:1px solid #efb6b1;border-radius:12px;padding:13px;color:#7f1d1d;font-weight:700;line-height:1.4}
+.foot{font-size:12px;line-height:1.45;color:var(--muted);padding:14px 4px 0}
+.pill{display:inline-block;padding:4px 8px;border-radius:99px;background:#eef2f5;font-size:12px;font-weight:800;margin-top:5px}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header class="head">
+<div class="tag">Ferramenta de apoio ao provedor</div>
+<h1>💉 Sayana Press + 6MMD</h1>
+<p class="intro">Calcula a orientação de reinjecção e sincronização com consultas de ART a partir das duas tabelas programáticas fornecidas.</p>
+</header>
+
+<section class="card">
+<div style="font-weight:800;margin-bottom:8px">1. Qual é a situação da cliente?</div>
+
+<label class="choice">
+<input type="radio" name="scenario" value="A">
+<strong>A. Já usava Sayana Press antes da recolha de ARVs / início de 6MMD</strong>
+<span>A última injecção aconteceu antes da consulta/recolha de ARVs.</span>
+</label>
+
+<label class="choice">
+<input type="radio" name="scenario" value="B">
+<strong>B. Recolheu ARVs antes de iniciar ou reinjectar Sayana Press</strong>
+<span>A última recolha de ARVs aconteceu antes da injecção actual.</span>
+</label>
+
+<div id="fieldsA" class="fields">
+<label class="field-label" for="aInjection">Data da última injecção de Sayana Press</label>
+<input id="aInjection" type="date">
+<label class="field-label" for="aArt">Data da consulta ART / início 6MMD / última recolha de ARVs</label>
+<input id="aArt" type="date">
+</div>
+
+<div id="fieldsB" class="fields">
+<label class="field-label" for="bArv">Data da última recolha de ARVs</label>
+<input id="bArv" type="date">
+<label class="field-label" for="bInjection">Data de início ou reinjecção actual de Sayana Press</label>
+<input id="bInjection" type="date">
+</div>
+
+<button id="calc">Calcular orientação</button>
+</section>
+
+<section id="resultCard" class="card result" aria-live="polite"><div id="output"></div></section>
+
+<div class="foot">
+Esta versão aplica apenas as categorias e intervalos apresentados nas duas tabelas fornecidas.
+Quando uma situação fica fora desses intervalos, a ferramenta não extrapola e recomenda consulta do protocolo/supervisor.
+“Semanas” são calculadas em blocos completos de 7 dias.
+</div>
+</main>
+
+<script>
+const fieldsA=document.getElementById('fieldsA');
+const fieldsB=document.getElementById('fieldsB');
+const resultCard=document.getElementById('resultCard');
+const output=document.getElementById('output');
+
+document.querySelectorAll('input[name="scenario"]').forEach(r=>r.addEventListener('change',()=>{
+  const s=document.querySelector('input[name="scenario"]:checked').value;
+  fieldsA.classList.toggle('show',s==='A');
+  fieldsB.classList.toggle('show',s==='B');
+  resultCard.classList.remove('show');
+}));
+
+function parseDate(v){
+  if(!v)return null;
+  const p=v.split('-').map(Number);
+  return new Date(p[0],p[1]-1,p[2],12,0,0);
+}
+function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x;}
+function addWeeks(d,w){return addDays(d,w*7);}
+function addMonths(d,m){
+  const x=new Date(d); const day=x.getDate();
+  x.setDate(1); x.setMonth(x.getMonth()+m);
+  const last=new Date(x.getFullYear(),x.getMonth()+1,0).getDate();
+  x.setDate(Math.min(day,last)); return x;
+}
+function fmt(d){
+  return new Intl.DateTimeFormat('pt-PT',{day:'2-digit',month:'long',year:'numeric'}).format(d);
+}
+function diffDays(a,b){return Math.floor((b-a)/(1000*60*60*24));}
+function intervalText(days){
+  const w=Math.floor(days/7),r=days%7;
+  return w+' semana'+(w===1?'':'s')+(r?' e '+r+' dia'+(r===1?'':'s'):'');
+}
+function row(label,value){
+  return '<div class="row"><div class="lbl">'+label+'</div><div class="val">'+value+'</div></div>';
+}
+function dateLine(label,date,extra){
+  return row(label,'<span class="date">'+fmt(date)+'</span>'+(extra?'<br>'+extra:''));
+}
+function fail(msg){
+  output.innerHTML='<div class="stop">'+msg+'</div>';
+  resultCard.classList.add('show');
+}
+function scenario(){
+  const s=document.querySelector('input[name="scenario"]:checked');
+  return s?s.value:null;
+}
+
+document.getElementById('calc').addEventListener('click',()=>{
+  const s=scenario();
+  if(!s)return fail('Seleccione primeiro a situação da cliente.');
+
+  if(s==='A'){
+    const last=parseDate(document.getElementById('aInjection').value);
+    const art=parseDate(document.getElementById('aArt').value);
+    if(!last||!art)return fail('Introduza as duas datas.');
+    const days=diffDays(last,art);
+    if(days<0)return fail('Neste cenário, a última injecção deve acontecer antes da consulta ART / recolha de ARVs.');
+    const w=Math.floor(days/7);
+
+    let html='<div class="banner orange"><div class="small">Intervalo calculado</div><div class="big">'+intervalText(days)+'</div><div class="pill">Cenário A</div></div>';
+
+    if(w<=5){
+      const next=addWeeks(last,15);
+      const nextArt=addMonths(art,6);
+      html+='<div class="banner blue"><div class="small">Categoria da tabela</div><div class="big">≤5 semanas antes</div></div>'+
+      dateLine('Próxima reinjecção',next,'Contar 15 semanas desde a última injecção.')+
+      row('2.ª reinjecção','Na próxima consulta ART.')+
+      dateLine('Próxima consulta ART — referência',nextArt,'Em 6 meses; auto-injecção no mesmo dia, de acordo com a tabela.')+
+      row('Doses de Sayana Press para levar para casa','<strong>1 dose</strong>');
+    } else if(w>=6&&w<=9){
+      const next=addWeeks(last,16);
+      const following=addWeeks(next,16);
+      html+='<div class="banner blue"><div class="small">Categoria da tabela</div><div class="big">6–9 semanas antes</div></div>'+
+      dateLine('Próxima reinjecção',next,'Contar 16 semanas desde a última injecção.')+
+      '<div class="alert">⚠️ A tabela indica enfatizar a importância de cumprir rigorosamente esta data.</div>'+
+      dateLine('Próxima consulta ART / 2.ª reinjecção — cálculo indicado',following,'Contar 16 semanas desde a data da próxima reinjecção; auto-injecção no mesmo dia.')+
+      row('Doses de Sayana Press para levar para casa','<strong>1 dose</strong>');
+    } else if(w>=10&&w<=15){
+      const second=addWeeks(art,12);
+      const nextArt=addMonths(art,6);
+      html+='<div class="banner blue"><div class="small">Categoria da tabela</div><div class="big">10–15 semanas antes</div></div>'+
+      dateLine('Próxima reinjecção',art,'Na consulta ART indicada.')+
+      dateLine('2.ª reinjecção',second,'Cliente sincronizada: 12 semanas após a consulta ART.')+
+      dateLine('Próxima consulta ART — referência',nextArt,'Em 6 meses; auto-injecção no mesmo dia.')+
+      row('Doses de Sayana Press para levar para casa','<strong>1 dose</strong>');
+    } else {
+      html+='<div class="stop">O intervalo calculado é superior a 15 semanas. Esta situação não está coberta pela tabela fornecida; não extrapolar a regra.</div>';
+    }
+    output.innerHTML=html; resultCard.classList.add('show');
+  }
+
+  if(s==='B'){
+    const arv=parseDate(document.getElementById('bArv').value);
+    const inj=parseDate(document.getElementById('bInjection').value);
+    if(!arv||!inj)return fail('Introduza as duas datas.');
+    const days=diffDays(arv,inj);
+    if(days<0)return fail('Neste cenário, a recolha de ARVs deve acontecer antes do início/reinjecção de Sayana Press.');
+    const w=Math.floor(days/7);
+
+    let html='<div class="banner blue"><div class="small">Intervalo calculado</div><div class="big">'+intervalText(days)+'</div><div class="pill">Cenário B</div></div>';
+
+    if(w<=5){
+      const next=addWeeks(inj,10);
+      html+='<div class="banner blue"><div class="small">Categoria da tabela</div><div class="big">≤5 semanas antes</div></div>'+
+      dateLine('Próxima reinjecção',next,'Na consulta ART ou SRH/FP: contar 10 semanas desde a injecção actual.')+
+      row('2.ª reinjecção','Na próxima consulta ART.')+
+      row('Próxima consulta ART','Em 6 meses se for uma consulta ART; se a reinjecção ocorrer numa consulta SRH/FP, manter a data ART programada. Auto-injecção no mesmo dia.')+
+      row('Doses de Sayana Press para levar para casa','<strong>1 dose</strong>');
+    } else if(w>=6&&w<=9){
+      const next=addWeeks(inj,15);
+      const second=addWeeks(next,15);
+      html+='<div class="banner blue"><div class="small">Categoria da tabela</div><div class="big">6–9 semanas antes</div></div>'+
+      dateLine('Próxima reinjecção',next,'Na consulta ART ou SRH/FP: contar 15 semanas desde a injecção actual.')+
+      dateLine('2.ª reinjecção',second,'Na próxima consulta ART: contar 15 semanas desde a última injecção.')+
+      row('Próxima consulta ART','Em 6 meses se for uma consulta ART; se a reinjecção ocorrer em SRH/FP, manter a data ART programada. Depois, aplicar o procedimento indicado para mulheres cuja última injecção foi ≤5 semanas antes.')+
+      row('Doses de Sayana Press para levar para casa','<strong>1 dose</strong>');
+    } else if(w>=10&&w<=14){
+      const nextArt=addMonths(arv,6);
+      const second=addWeeks(nextArt,12);
+      html+='<div class="banner blue"><div class="small">Categoria da tabela</div><div class="big">10–14 semanas antes</div></div>'+
+      dateLine('Próxima consulta ART — referência',nextArt,'Calculada como 6 meses após a última recolha de ARVs.')+
+      dateLine('Próxima reinjecção',nextArt,'Na próxima consulta ART.')+
+      dateLine('2.ª reinjecção',second,'Cliente sincronizada: 12 semanas após a consulta ART.')+
+      row('Seguimento','Em 6 meses; auto-injecção no mesmo dia, segundo a tabela.')+
+      row('Doses de Sayana Press para levar para casa','<strong>1 dose</strong>');
+    } else {
+      html+='<div class="stop">O intervalo calculado é de 15 semanas ou mais. Esta situação não está coberta pela tabela fornecida; não extrapolar a regra.</div>';
+    }
+    output.innerHTML=html; resultCard.classList.add('show');
+  }
+});
+</script>
+</body>
+</html>
