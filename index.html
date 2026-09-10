@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calculadora Sayana Press + 6MMD</title>
+<title>Calculadora Sayana Press + Dispensa Semestral de ARVs (DS)</title>
 <style>
 :root{
   --bg:#f4f6f8; --card:#fff; --text:#20323f; --muted:#60717d;
@@ -25,7 +25,9 @@ h1{font-size:27px;line-height:1.15;margin:5px 0 8px}
 .fields{display:none;margin-top:15px;border-top:1px solid var(--border);padding-top:15px}
 .fields.show{display:block}
 label.field-label{display:block;font-size:14px;font-weight:800;margin:12px 0 7px}
-input[type=date]{width:100%;padding:13px;border:1px solid #bccbd4;border-radius:11px;font-size:16px;background:#fff;min-height:48px}
+input[type=date],select{width:100%;padding:13px;border:1px solid #bccbd4;border-radius:11px;font-size:16px;background:#fff;min-height:48px;color:var(--text)}
+.helper{font-size:12px;line-height:1.4;color:var(--muted);margin-top:5px}
+.subquestion{font-size:14px;font-weight:800;margin:16px 0 7px}
 button{width:100%;margin-top:16px;padding:14px;border:0;border-radius:12px;font-size:16px;font-weight:800;background:var(--blue);color:white;cursor:pointer}
 .result{display:none}.result.show{display:block}
 .banner{border-radius:13px;padding:14px;margin-bottom:12px}
@@ -41,14 +43,30 @@ button{width:100%;margin-top:16px;padding:14px;border:0;border-radius:12px;font-
 .stop{background:#fdecea;border:1px solid #efb6b1;border-radius:12px;padding:13px;color:#7f1d1d;font-weight:700;line-height:1.4}
 .foot{font-size:12px;line-height:1.45;color:var(--muted);padding:14px 4px 0}
 .pill{display:inline-block;padding:4px 8px;border-radius:99px;background:#eef2f5;font-size:12px;font-weight:800;margin-top:5px}
+
+.reference-card{background:#fff;border:1px solid var(--border);border-radius:17px;padding:0;margin-top:14px;box-shadow:0 4px 16px rgba(0,0,0,.04);overflow:hidden}
+.reference-card details{width:100%}
+.reference-card summary{cursor:pointer;list-style:none;padding:17px;font-weight:800;font-size:16px;background:#edf5e8}
+.reference-card summary::-webkit-details-marker{display:none}
+.reference-card summary:after{content:"＋";float:right;font-size:20px;line-height:1}
+.reference-card details[open] summary:after{content:"−"}
+.ref-body{padding:16px}
+.ref-intro{font-size:14px;line-height:1.45;color:var(--muted);margin:0 0 12px}
+.guidance-item{border:1px solid var(--border);border-radius:12px;padding:13px;margin:10px 0;background:#fff}
+.guidance-item.base{background:#f1f7ed;border-color:#cbdcbe}
+.guidance-title{font-weight:800;line-height:1.35;margin-bottom:8px}
+.guidance-grid{display:grid;grid-template-columns:1fr;gap:7px}
+.guidance-row{font-size:14px;line-height:1.4}
+.guidance-row b{color:var(--blue)}
+
 </style>
 </head>
 <body>
 <main class="wrap">
 <header class="head">
 <div class="tag">Ferramenta de apoio ao provedor</div>
-<h1>💉 Sayana Press + 6MMD</h1>
-<p class="intro">Calcula a orientação de reinjecção e sincronização com consultas de ART a partir das duas tabelas programáticas fornecidas.</p>
+<h1>💉 Sayana Press + Dispensa Semestral de ARVs (DS)</h1>
+<p class="intro">Calcula a orientação de reinjecção e sincronização com consultas de TARV no contexto da Dispensa Semestral de ARVs (DS).</p>
 </header>
 
 <section class="card">
@@ -56,7 +74,7 @@ button{width:100%;margin-top:16px;padding:14px;border:0;border-radius:12px;font-
 
 <label class="choice">
 <input type="radio" name="scenario" value="A">
-<strong>A. Já usava Sayana Press antes da recolha de ARVs / início de 6MMD</strong>
+<strong>A. Já usava Sayana Press antes da recolha de ARVs / início da DS</strong>
 <span>A última injecção aconteceu antes da consulta/recolha de ARVs.</span>
 </label>
 
@@ -69,7 +87,7 @@ button{width:100%;margin-top:16px;padding:14px;border:0;border-radius:12px;font-
 <div id="fieldsA" class="fields">
 <label class="field-label" for="aInjection">Data da última injecção de Sayana Press</label>
 <input id="aInjection" type="date">
-<label class="field-label" for="aArt">Data da consulta ART / início 6MMD / última recolha de ARVs</label>
+<label class="field-label" for="aArt">Data da consulta TARV / início da DS / última recolha de ARVs</label>
 <input id="aArt" type="date">
 </div>
 
@@ -80,13 +98,81 @@ button{width:100%;margin-top:16px;padding:14px;border:0;border-radius:12px;font-
 <input id="bInjection" type="date">
 </div>
 
+<label class="choice">
+<input type="radio" name="scenario" value="C">
+<strong>C. Inicia/faz reinjecção de Sayana Press e DS no mesmo dia, ou já está sincronizada</strong>
+<span>Usar para calcular a injecção intercalar e ajustar a reinjecção seguinte quando a injecção é adiantada ou atrasada.</span>
+</label>
+
+<div id="fieldsC" class="fields">
+<label class="field-label" for="cTarv">Data da consulta TARV / DS de referência</label>
+<input id="cTarv" type="date">
+
+<label class="field-label" for="cNextTarv">Data da próxima consulta TARV <span style="font-weight:400">(opcional, se já marcada)</span></label>
+<input id="cNextTarv" type="date">
+<div class="helper">A tabela indica que a próxima consulta TARV deve ocorrer dentro de 6 meses. Se não souber a data exacta, deixe este campo em branco.</div>
+
+<div class="subquestion">O que acontece com a injecção intercalar?</div>
+<select id="cShift">
+  <option value="0">É feita na data programada — 12 semanas</option>
+  <option value="-1">É adiantada 1 semana</option>
+  <option value="-2">É adiantada 2 semanas</option>
+  <option value="1">É atrasada 1 semana</option>
+  <option value="2">É atrasada 2 semanas</option>
+  <option value="3">É atrasada 3 semanas</option>
+  <option value="4">É atrasada 4 semanas</option>
+</select>
+</div>
+
 <button id="calc">Calcular orientação</button>
 </section>
 
 <section id="resultCard" class="card result" aria-live="polite"><div id="output"></div></section>
 
+
+<section class="reference-card">
+<details>
+<summary>📋 Ver regras usadas no cenário de utentes sincronizadas</summary>
+<div class="ref-body">
+<p class="ref-intro">
+Orientação para utente que inicia/faz reinjecção de Sayana Press e a dispensa de ARVs no mesmo dia,
+ou para mulher já sincronizada.
+</p>
+
+<div class="guidance-item base">
+  <div class="guidance-title">Inicia/faz reinjecção de Sayana Press e DS no mesmo dia, ou já está sincronizada</div>
+  <div class="guidance-grid">
+    <div class="guidance-row"><b>Próxima injecção:</b> contar 12 semanas a partir da data da consulta TARV.</div>
+    <div class="guidance-row"><b>Segunda reinjecção:</b> na consulta TARV seguinte.</div>
+    <div class="guidance-row"><b>Próxima consulta TARV:</b> dentro de 6 meses → auto-injecção no mesmo dia.</div>
+  </div>
+</div>
+
+<div class="guidance-item">
+  <div class="guidance-title">Adianta a injecção intercalar entre as duas consultas TARV em 1–2 semanas</div>
+  <div class="guidance-row"><b>Orientação:</b> realizar a reinjecção seguinte na consulta TARV seguinte.</div>
+</div>
+
+<div class="guidance-item">
+  <div class="guidance-title">Atrasa a injecção intercalar entre as duas consultas TARV em 1–2 semanas</div>
+  <div class="guidance-row"><b>Orientação:</b> realizar a reinjecção seguinte na consulta TARV seguinte.</div>
+</div>
+
+<div class="guidance-item">
+  <div class="guidance-title">Atrasa a injecção intercalar entre as duas consultas TARV em 3 semanas</div>
+  <div class="guidance-row"><b>Orientação:</b> atrasar 1 semana a reinjecção a partir da data da consulta TARV; a reinjecção intercalar seguinte será em 12 semanas.</div>
+</div>
+
+<div class="guidance-item">
+  <div class="guidance-title">Atrasa a injecção intercalar entre as duas consultas TARV em 4 semanas</div>
+  <div class="guidance-row"><b>Orientação:</b> atrasar 2 semanas a reinjecção a partir da data da consulta TARV; a reinjecção intercalar seguinte será em 12 semanas.</div>
+</div>
+</div>
+</details>
+</section>
+
 <div class="foot">
-Esta versão aplica apenas as categorias e intervalos apresentados nas duas tabelas fornecidas.
+Esta versão aplica as categorias, intervalos e pressupostos apresentados nas tabelas programáticas fornecidas, incluindo o cálculo interactivo para utentes sincronizadas.
 Quando uma situação fica fora desses intervalos, a ferramenta não extrapola e recomenda consulta do protocolo/supervisor.
 “Semanas” são calculadas em blocos completos de 7 dias.
 </div>
@@ -95,6 +181,7 @@ Quando uma situação fica fora desses intervalos, a ferramenta não extrapola e
 <script>
 const fieldsA=document.getElementById('fieldsA');
 const fieldsB=document.getElementById('fieldsB');
+const fieldsC=document.getElementById('fieldsC');
 const resultCard=document.getElementById('resultCard');
 const output=document.getElementById('output');
 
@@ -102,6 +189,7 @@ document.querySelectorAll('input[name="scenario"]').forEach(r=>r.addEventListene
   const s=document.querySelector('input[name="scenario"]:checked').value;
   fieldsA.classList.toggle('show',s==='A');
   fieldsB.classList.toggle('show',s==='B');
+  fieldsC.classList.toggle('show',s==='C');
   resultCard.classList.remove('show');
 }));
 
@@ -150,7 +238,7 @@ document.getElementById('calc').addEventListener('click',()=>{
     const art=parseDate(document.getElementById('aArt').value);
     if(!last||!art)return fail('Introduza as duas datas.');
     const days=diffDays(last,art);
-    if(days<0)return fail('Neste cenário, a última injecção deve acontecer antes da consulta ART / recolha de ARVs.');
+    if(days<0)return fail('Neste cenário, a última injecção deve acontecer antes da consulta TARV / recolha de ARVs.');
     const w=Math.floor(days/7);
 
     let html='<div class="banner orange"><div class="small">Intervalo calculado</div><div class="big">'+intervalText(days)+'</div><div class="pill">Cenário A</div></div>';
@@ -160,25 +248,25 @@ document.getElementById('calc').addEventListener('click',()=>{
       const nextArt=addMonths(art,6);
       html+='<div class="banner blue"><div class="small">Categoria da tabela</div><div class="big">≤5 semanas antes</div></div>'+
       dateLine('Próxima reinjecção',next,'Contar 15 semanas desde a última injecção.')+
-      row('2.ª reinjecção','Na próxima consulta ART.')+
-      dateLine('Próxima consulta ART — referência',nextArt,'Em 6 meses; auto-injecção no mesmo dia, de acordo com a tabela.')+
-      row('Doses de Sayana Press para levar para casa','<strong>1 dose</strong>');
+      row('2.ª reinjecção','Na próxima consulta TARV.')+
+      dateLine('Próxima consulta TARV — referência',nextArt,'Em 6 meses; auto-injecção no mesmo dia, de acordo com a tabela.')+
+      row('Doses de Sayana Press para levar para casa','<strong>2 doses</strong>');
     } else if(w>=6&&w<=9){
       const next=addWeeks(last,16);
       const following=addWeeks(next,16);
       html+='<div class="banner blue"><div class="small">Categoria da tabela</div><div class="big">6–9 semanas antes</div></div>'+
       dateLine('Próxima reinjecção',next,'Contar 16 semanas desde a última injecção.')+
       '<div class="alert">⚠️ A tabela indica enfatizar a importância de cumprir rigorosamente esta data.</div>'+
-      dateLine('Próxima consulta ART / 2.ª reinjecção — cálculo indicado',following,'Contar 16 semanas desde a data da próxima reinjecção; auto-injecção no mesmo dia.')+
-      row('Doses de Sayana Press para levar para casa','<strong>1 dose</strong>');
+      dateLine('Próxima consulta TARV / 2.ª reinjecção — cálculo indicado',following,'Contar 16 semanas desde a data da próxima reinjecção; auto-injecção no mesmo dia.')+
+      row('Doses de Sayana Press para levar para casa','<strong>2 doses</strong>');
     } else if(w>=10&&w<=15){
       const second=addWeeks(art,12);
       const nextArt=addMonths(art,6);
       html+='<div class="banner blue"><div class="small">Categoria da tabela</div><div class="big">10–15 semanas antes</div></div>'+
-      dateLine('Próxima reinjecção',art,'Na consulta ART indicada.')+
-      dateLine('2.ª reinjecção',second,'Cliente sincronizada: 12 semanas após a consulta ART.')+
-      dateLine('Próxima consulta ART — referência',nextArt,'Em 6 meses; auto-injecção no mesmo dia.')+
-      row('Doses de Sayana Press para levar para casa','<strong>1 dose</strong>');
+      dateLine('Próxima reinjecção',art,'Na consulta TARV indicada.')+
+      dateLine('2.ª reinjecção',second,'Cliente sincronizada: 12 semanas após a consulta TARV.')+
+      dateLine('Próxima consulta TARV — referência',nextArt,'Em 6 meses; auto-injecção no mesmo dia.')+
+      row('Doses de Sayana Press para levar para casa','<strong>2 doses</strong>');
     } else {
       html+='<div class="stop">O intervalo calculado é superior a 15 semanas. Esta situação não está coberta pela tabela fornecida; não extrapolar a regra.</div>';
     }
@@ -198,30 +286,100 @@ document.getElementById('calc').addEventListener('click',()=>{
     if(w<=5){
       const next=addWeeks(inj,10);
       html+='<div class="banner blue"><div class="small">Categoria da tabela</div><div class="big">≤5 semanas antes</div></div>'+
-      dateLine('Próxima reinjecção',next,'Na consulta ART ou SRH/FP: contar 10 semanas desde a injecção actual.')+
-      row('2.ª reinjecção','Na próxima consulta ART.')+
-      row('Próxima consulta ART','Em 6 meses se for uma consulta ART; se a reinjecção ocorrer numa consulta SRH/FP, manter a data ART programada. Auto-injecção no mesmo dia.')+
-      row('Doses de Sayana Press para levar para casa','<strong>1 dose</strong>');
+      dateLine('Próxima reinjecção',next,'Na consulta TARV ou SSR/PF: contar 10 semanas desde a injecção actual.')+
+      row('2.ª reinjecção','Na próxima consulta TARV.')+
+      row('Próxima consulta TARV','Em 6 meses se for uma consulta TARV; se a reinjecção ocorrer numa consulta SSR/PF, manter a data TARV programada. Auto-injecção no mesmo dia.')+
+      row('Doses de Sayana Press para levar para casa','<strong>2 doses</strong>');
     } else if(w>=6&&w<=9){
       const next=addWeeks(inj,15);
       const second=addWeeks(next,15);
       html+='<div class="banner blue"><div class="small">Categoria da tabela</div><div class="big">6–9 semanas antes</div></div>'+
-      dateLine('Próxima reinjecção',next,'Na consulta ART ou SRH/FP: contar 15 semanas desde a injecção actual.')+
-      dateLine('2.ª reinjecção',second,'Na próxima consulta ART: contar 15 semanas desde a última injecção.')+
-      row('Próxima consulta ART','Em 6 meses se for uma consulta ART; se a reinjecção ocorrer em SRH/FP, manter a data ART programada. Depois, aplicar o procedimento indicado para mulheres cuja última injecção foi ≤5 semanas antes.')+
-      row('Doses de Sayana Press para levar para casa','<strong>1 dose</strong>');
+      dateLine('Próxima reinjecção',next,'Na consulta TARV ou SSR/PF: contar 15 semanas desde a injecção actual.')+
+      dateLine('2.ª reinjecção',second,'Na próxima consulta TARV: contar 15 semanas desde a última injecção.')+
+      row('Próxima consulta TARV','Em 6 meses se for uma consulta TARV; se a reinjecção ocorrer em SSR/PF, manter a data TARV programada. Depois, aplicar o procedimento indicado para mulheres cuja última injecção foi ≤5 semanas antes.')+
+      row('Doses de Sayana Press para levar para casa','<strong>2 doses</strong>');
     } else if(w>=10&&w<=14){
       const nextArt=addMonths(arv,6);
       const second=addWeeks(nextArt,12);
       html+='<div class="banner blue"><div class="small">Categoria da tabela</div><div class="big">10–14 semanas antes</div></div>'+
-      dateLine('Próxima consulta ART — referência',nextArt,'Calculada como 6 meses após a última recolha de ARVs.')+
-      dateLine('Próxima reinjecção',nextArt,'Na próxima consulta ART.')+
-      dateLine('2.ª reinjecção',second,'Cliente sincronizada: 12 semanas após a consulta ART.')+
+      dateLine('Próxima consulta TARV — referência',nextArt,'Calculada como 6 meses após a última recolha de ARVs.')+
+      dateLine('Próxima reinjecção',nextArt,'Na próxima consulta TARV.')+
+      dateLine('2.ª reinjecção',second,'Cliente sincronizada: 12 semanas após a consulta TARV.')+
       row('Seguimento','Em 6 meses; auto-injecção no mesmo dia, segundo a tabela.')+
-      row('Doses de Sayana Press para levar para casa','<strong>1 dose</strong>');
+      row('Doses de Sayana Press para levar para casa','<strong>2 doses</strong>');
     } else {
       html+='<div class="stop">O intervalo calculado é de 15 semanas ou mais. Esta situação não está coberta pela tabela fornecida; não extrapolar a regra.</div>';
     }
+    output.innerHTML=html; resultCard.classList.add('show');
+  }
+
+  if(s==='C'){
+    const tarv=parseDate(document.getElementById('cTarv').value);
+    const nextTarv=parseDate(document.getElementById('cNextTarv').value);
+    const shift=parseInt(document.getElementById('cShift').value,10);
+
+    if(!tarv)return fail('Introduza a data da consulta TARV / DS de referência.');
+    if(nextTarv && nextTarv<tarv)return fail('A próxima consulta TARV não pode ocorrer antes da consulta TARV / DS de referência.');
+
+    const baseIntercalary=addWeeks(tarv,12);
+    const actualIntercalary=addWeeks(baseIntercalary,shift);
+
+    const shiftLabels={
+      0:'Sem adiantamento ou atraso — 12 semanas',
+      '-1':'Adiantada 1 semana',
+      '-2':'Adiantada 2 semanas',
+      1:'Atrasada 1 semana',
+      2:'Atrasada 2 semanas',
+      3:'Atrasada 3 semanas',
+      4:'Atrasada 4 semanas'
+    };
+
+    let html='<div class="banner blue"><div class="small">Utente sincronizada / DS no mesmo dia</div><div class="big">'+shiftLabels[shift]+'</div><div class="pill">Cenário C</div></div>';
+
+    html+=dateLine('Data programada da injecção intercalar',baseIntercalary,'12 semanas a partir da consulta TARV / DS.');
+
+    if(shift!==0){
+      html+=dateLine('Data da injecção intercalar ajustada',actualIntercalary,
+        shift<0 ? 'A injecção é adiantada em '+Math.abs(shift)+' semana'+(Math.abs(shift)>1?'s':'')+'.'
+                : 'A injecção é atrasada em '+shift+' semana'+(shift>1?'s':'')+'.');
+    }
+
+    if(nextTarv){
+      const sixMonthReference=addMonths(tarv,6);
+      html+=dateLine('Próxima consulta TARV',nextTarv,'Data introduzida pelo provedor.');
+
+      if(nextTarv>sixMonthReference){
+        html+='<div class="alert">⚠️ A data introduzida para a próxima consulta TARV é posterior a 6 meses da consulta de referência. Confirme a marcação, pois a tabela indica consulta TARV dentro de 6 meses.</div>';
+      }
+
+      if(shift<=2){
+        html+=dateLine('Reinjecção seguinte',nextTarv,'Realizar na próxima consulta TARV.');
+      } else if(shift===3){
+        const second=addWeeks(nextTarv,1);
+        const following=addWeeks(second,12);
+        html+=dateLine('Reinjecção seguinte',second,'Atrasar 1 semana a partir da data da próxima consulta TARV.');
+        html+=dateLine('Injecção intercalar seguinte',following,'12 semanas após esta reinjecção.');
+      } else if(shift===4){
+        const second=addWeeks(nextTarv,2);
+        const following=addWeeks(second,12);
+        html+=dateLine('Reinjecção seguinte',second,'Atrasar 2 semanas a partir da data da próxima consulta TARV.');
+        html+=dateLine('Injecção intercalar seguinte',following,'12 semanas após esta reinjecção.');
+      }
+    } else {
+      html+=row('Próxima consulta TARV','Dentro de 6 meses. Introduza a data quando estiver marcada para obter a data exacta da reinjecção seguinte.');
+
+      if(shift<=2){
+        html+=row('Reinjecção seguinte','Na próxima consulta TARV.');
+      } else if(shift===3){
+        html+=row('Reinjecção seguinte','1 semana após a próxima consulta TARV.');
+        html+=row('Injecção intercalar seguinte','12 semanas após essa reinjecção.');
+      } else if(shift===4){
+        html+=row('Reinjecção seguinte','2 semanas após a próxima consulta TARV.');
+        html+=row('Injecção intercalar seguinte','12 semanas após essa reinjecção.');
+      }
+    }
+
+    html+=row('Doses de Sayana Press para levar para casa','<strong>2 doses</strong>');
     output.innerHTML=html; resultCard.classList.add('show');
   }
 });
