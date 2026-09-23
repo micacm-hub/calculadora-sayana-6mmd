@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Injectáveis + Dispensa Semestral de ARVs (DS)</title>
+<style>
+:root{
+  --bg:#f4f6f8; --card:#fff; --text:#20323f; --muted:#60717d;
+  --blue:#23476d; --blue2:#eaf1f8; --orange:#d76600; --orange2:#fff1e6;
+  --green:#176b55; --border:#d7e0e6;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--text)}
+.wrap{max-width:680px;margin:0 auto;padding:18px 14px 42px}
+.head{padding:14px 4px}
+.tag{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--blue)}
+h1{font-size:27px;line-height:1.15;margin:5px 0 8px}
+.intro{margin:0;color:var(--muted);font-size:15px;line-height:1.45}
+.card{background:var(--card);border:1px solid var(--border);border-radius:17px;padding:17px;margin-top:14px;box-shadow:0 4px 16px rgba(0,0,0,.04)}
+.choice{display:block;padding:12px;border:1px solid var(--border);border-radius:12px;margin:9px 0;cursor:pointer;line-height:1.35}
+.choice input{margin-right:8px}
+.choice strong{display:block;margin-left:25px;margin-top:-18px}
+.choice span{display:block;color:var(--muted);font-size:13px;margin:4px 0 0 25px}
+.fields{display:none;margin-top:15px;border-top:1px solid var(--border);padding-top:15px}
+.fields.show{display:block}
+label.field-label{display:block;font-size:14px;font-weight:800;margin:12px 0 7px}
+input[type=date],select{width:100%;padding:13px;border:1px solid #bccbd4;border-radius:11px;font-size:16px;background:#fff;min-height:48px;color:var(--text)}
+.helper{font-size:12px;line-height:1.4;color:var(--muted);margin-top:5px}
+.subquestion{font-size:14px;font-weight:800;margin:16px 0 7px}
+button{width:100%;margin-top:16px;padding:14px;border:0;border-radius:12px;font-size:16px;font-weight:800;background:var(--blue);color:white;cursor:pointer}
+.result{display:none}.result.show{display:block}
+.banner{border-radius:13px;padding:14px;margin-bottom:12px}
+.banner.orange{background:var(--orange2);border:1px solid #f2c79f}
+.banner.blue{background:var(--blue2);border:1px solid #c7d9ea}
+.banner .small{font-size:12px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.banner .big{font-size:20px;font-weight:800;line-height:1.25}
+.row{padding:13px 0;border-top:1px solid var(--border)}
+.row .lbl{font-size:12px;text-transform:uppercase;font-weight:800;color:var(--muted);margin-bottom:4px}
+.row .val{font-size:16px;font-weight:700;line-height:1.4}
+.date{color:var(--green)}
+.alert{background:#fff7e0;border:1px solid #edd797;border-radius:12px;padding:12px;font-size:14px;line-height:1.4;margin-top:10px}
+.stop{background:#fdecea;border:1px solid #efb6b1;border-radius:12px;padding:13px;color:#7f1d1d;font-weight:700;line-height:1.4}
+.foot{font-size:12px;line-height:1.45;color:var(--muted);padding:14px 4px 0}
+.pill{display:inline-block;padding:4px 8px;border-radius:99px;background:#eef2f5;font-size:12px;font-weight:800;margin-top:5px}
+
+.reference-card{background:#fff;border:1px solid var(--border);border-radius:17px;padding:0;margin-top:14px;box-shadow:0 4px 16px rgba(0,0,0,.04);overflow:hidden}
+.reference-card details{width:100%}
+.reference-card summary{cursor:pointer;list-style:none;padding:17px;font-weight:800;font-size:16px;background:#edf5e8}
+.reference-card summary::-webkit-details-marker{display:none}
+.reference-card summary:after{content:"＋";float:right;font-size:20px;line-height:1}
+.reference-card details[open] summary:after{content:"−"}
+.ref-body{padding:16px}
+.ref-intro{font-size:14px;line-height:1.45;color:var(--muted);margin:0 0 12px}
+.guidance-item{border:1px solid var(--border);border-radius:12px;padding:13px;margin:10px 0;background:#fff}
+.guidance-item.base{background:#f1f7ed;border-color:#cbdcbe}
+.guidance-title{font-weight:800;line-height:1.35;margin-bottom:8px}
+.guidance-grid{display:grid;grid-template-columns:1fr;gap:7px}
+.guidance-row{font-size:14px;line-height:1.4}
+.guidance-row b{color:var(--blue)}
+
+
+.quickcalc{margin-top:14px;padding:14px;border:1px dashed #b9c9d4;border-radius:12px;background:#fafcfd}
+.quickcalc h3{margin:0 0 8px;font-size:15px}
+.inline-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){.inline-grid{grid-template-columns:1fr}}
+.copy-note{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.4}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header class="head">
+<div class="tag">Ferramenta de apoio ao provedor</div>
+<h1>💉 Injectáveis + Dispensa Semestral de ARVs (DS)</h1>
+<p class="intro">Calcula a orientação de reinjecção e sincronização com consultas de TARV no contexto da Dispensa Semestral de ARVs (DS).</p>
+</header>
+
+<section class="card">
+<div style="font-weight:800;margin-bottom:8px">1. Qual é a situação da utente?</div>
+
+<label class="choice">
+<input type="radio" name="scenario" value="A">
+<strong>A. Mulheres que iniciam a DS de ARVs e o injectável no mesmo dia, ou que levantam os ARVs no mesmo dia da injecção, e mulheres já sincronizadas</strong>
+<span>Usar para calcular a injecção intercalar e ajustar a reinjecção seguinte quando a injecção é adiantada ou atrasada.</span>
+</label>
+<div id="fieldsA" class="fields">
+<label class="field-label" for="aTarv">Data da consulta TARV / DS de referência</label>
+<input id="aTarv" type="date">
+<label class="field-label" for="aNextTarv">Data da próxima consulta TARV <span style="font-weight:400">(opcional, se já marcada)</span></label>
+<input id="aNextTarv" type="date">
+<div class="helper">A próxima consulta TARV deve ocorrer dentro de 6 meses. Se não souber a data exacta, deixe em branco.</div>
+<div class="subquestion">O que acontece com a injecção intercalar?</div>
+<select id="aShift">
+<option value="0">É feita na data programada — 12 semanas</option>
+<option value="-1">É adiantada 1 semana</option>
+<option value="-2">É adiantada 2 semanas</option>
+<option value="1">É atrasada 1 semana</option>
+<option value="2">É atrasada 2 semanas</option>
+<option value="3">É atrasada 3 semanas</option>
+<option value="4">É atrasada 4 semanas</option>
+</select>
+</div>
+
+<label class="choice">
+<input type="radio" name="scenario" value="B">
+<strong>B. Mulheres que já utilizam injectáveis e iniciam a DS de ARVs ou levantam os ARVs após a última injecção</strong>
+<span>A última injecção aconteceu antes da consulta TARV / levantamento de ARVs.</span>
+</label>
+<div id="fieldsB" class="fields">
+<label class="field-label" for="bInjection">Data da última injecção</label>
+<input id="bInjection" type="date">
+<label class="field-label" for="bTarv">Data da consulta TARV / início da DS / levantamento de ARVs</label>
+<input id="bTarv" type="date">
+</div>
+
+<label class="choice">
+<input type="radio" name="scenario" value="C">
+<strong>C. Mulheres que iniciam a DS de ARVs ou levantam os ARVs antes de iniciar os injectáveis ou realizar a reinjecção — mulher na consulta TARV</strong>
+<span>A utente encontra-se na consulta TARV.</span>
+</label>
+<div id="fieldsC" class="fields">
+<label class="field-label" for="cArv">Data da última recolha / levantamento de ARVs</label>
+<input id="cArv" type="date">
+<label class="field-label" for="cInjection">Data de início ou reinjecção actual do injectável</label>
+<input id="cInjection" type="date">
+</div>
+
+<label class="choice">
+<input type="radio" name="scenario" value="D">
+<strong>D. Mulheres que iniciam a DS de ARVs ou levantam os ARVs antes de iniciar os injectáveis ou realizar a reinjecção — mulher na consulta SSR/PF</strong>
+<span>A utente encontra-se na consulta SSR/PF.</span>
+</label>
+<div id="fieldsD" class="fields">
+<label class="field-label" for="dArv">Data da última recolha / levantamento de ARVs</label>
+<input id="dArv" type="date">
+<label class="field-label" for="dInjection">Data de início ou reinjecção actual do injectável</label>
+<input id="dInjection" type="date">
+</div>
+
+<div class="quickcalc">
+<h3>🗓️ Calcular uma data a partir de “há X semanas”</h3>
+<div class="inline-grid">
+<div>
+<label class="field-label" for="qDate">Data da consulta actual</label>
+<input id="qDate" type="date">
+</div>
+<div>
+<label class="field-label" for="qWeeks">Última injecção há quantas semanas?</label>
+<input id="qWeeks" type="number" min="0" max="52" step="1" inputmode="numeric" placeholder="Ex.: 8">
+</div>
+</div>
+<button id="quickCalcBtn" type="button" style="margin-top:10px;background:#60717d">Calcular data da última injecção</button>
+<div id="quickCalcResult" class="copy-note" aria-live="polite"></div>
+</div>
+
+<button id="calc">Calcular orientação</button>
+</section>
+
+<section id="resultCard" class="card result" aria-live="polite"><div id="output"></div></section>
+
+
+<section class="reference-card">
+<details>
+<summary>📋 Ver regras usadas no cenário de utentes sincronizadas</summary>
+<div class="ref-body">
+<p class="ref-intro">
+Orientação para utente que inicia/faz reinjecção de Injectáveis e a dispensa de ARVs no mesmo dia,
+ou para mulher já sincronizada.
+</p>
+
+<div class="guidance-item base">
+  <div class="guidance-title">Inicia/faz reinjecção de Injectáveis e DS no mesmo dia, ou já está sincronizada</div>
+  <div class="guidance-grid">
+    <div class="guidance-row"><b>Próxima injecção:</b> contar 12 semanas a partir da data da consulta TARV.</div>
+    <div class="guidance-row"><b>Segunda reinjecção:</b> na consulta TARV seguinte.</div>
+    <div class="guidance-row"><b>Próxima consulta TARV:</b> dentro de 6 meses → auto-injecção no mesmo dia.</div>
+  </div>
+</div>
+
+<div class="guidance-item">
+  <div class="guidance-title">Adianta a injecção intercalar entre as duas consultas TARV em 1–2 semanas</div>
+  <div class="guidance-row"><b>Orientação:</b> realizar a reinjecção seguinte na consulta TARV seguinte.</div>
+</div>
+
+<div class="guidance-item">
+  <div class="guidance-title">Atrasa a injecção intercalar entre as duas consultas TARV em 1–2 semanas</div>
+  <div class="guidance-row"><b>Orientação:</b> realizar a reinjecção seguinte na consulta TARV seguinte.</div>
+</div>
+
+<div class="guidance-item">
+  <div class="guidance-title">Atrasa a injecção intercalar entre as duas consultas TARV em 3 semanas</div>
+  <div class="guidance-row"><b>Orientação:</b> atrasar 1 semana a reinjecção a partir da data da consulta TARV; a reinjecção intercalar seguinte será em 12 semanas.</div>
+</div>
+
+<div class="guidance-item">
+  <div class="guidance-title">Atrasa a injecção intercalar entre as duas consultas TARV em 4 semanas</div>
+  <div class="guidance-row"><b>Orientação:</b> atrasar 2 semanas a reinjecção a partir da data da consulta TARV; a reinjecção intercalar seguinte será em 12 semanas.</div>
+</div>
+</div>
+</details>
+</section>
+
+<div class="foot">
+Esta versão aplica as categorias, intervalos e pressupostos apresentados nas tabelas programáticas fornecidas, incluindo o cálculo interactivo para utentes sincronizadas.
+Quando uma situação fica fora desses intervalos, a ferramenta não extrapola e recomenda consulta do protocolo/supervisor.
+“Semanas” são calculadas em blocos completos de 7 dias.
+</div>
+</main>
+
+<script>
+const resultCard=document.getElementById('resultCard');
+const output=document.getElementById('output');
+const fields={A:document.getElementById('fieldsA'),B:document.getElementById('fieldsB'),C:document.getElementById('fieldsC'),D:document.getElementById('fieldsD')};
+
+document.querySelectorAll('input[name="scenario"]').forEach(r=>r.addEventListener('change',()=>{
+ const s=document.querySelector('input[name="scenario"]:checked').value;
+ Object.keys(fields).forEach(k=>fields[k].classList.toggle('show',k===s));
+ resultCard.classList.remove('show');
+}));
+
+function parseDate(v){if(!v)return null;const p=v.split('-').map(Number);return new Date(Date.UTC(p[0],p[1]-1,p[2]));}
+function addDays(d,n){const x=new Date(d.getTime());x.setUTCDate(x.getUTCDate()+n);return x;}
+function addWeeks(d,w){return addDays(d,w*7);}
+function addMonths(d,m){const x=new Date(d.getTime()),day=x.getUTCDate();x.setUTCDate(1);x.setUTCMonth(x.getUTCMonth()+m);const last=new Date(Date.UTC(x.getUTCFullYear(),x.getUTCMonth()+1,0)).getUTCDate();x.setUTCDate(Math.min(day,last));return x;}
+function fmt(d){return new Intl.DateTimeFormat('pt-PT',{day:'2-digit',month:'long',year:'numeric',timeZone:'UTC'}).format(d);}
+function diffDays(a,b){return Math.round((b-a)/86400000);}
+function intervalText(days){const w=Math.floor(days/7),r=days%7;return w+' semana'+(w===1?'':'s')+(r?' e '+r+' dia'+(r===1?'':'s'):'');}
+function row(label,value){return '<div class="row"><div class="lbl">'+label+'</div><div class="val">'+value+'</div></div>';}
+function dateLine(label,date,extra){return row(label,'<span class="date">'+fmt(date)+'</span>'+(extra?'<br>'+extra:''));}
+function fail(msg){output.innerHTML='<div class="stop">'+msg+'</div>';resultCard.classList.add('show');}
+function scenario(){const s=document.querySelector('input[name="scenario"]:checked');return s?s.value:null;}
+
+function runA(){
+ const tarv=parseDate(document.getElementById('aTarv').value), nextTarv=parseDate(document.getElementById('aNextTarv').value);
+ const shift=parseInt(document.getElementById('aShift').value,10);
+ if(!tarv)return fail('Introduza a data da consulta TARV / DS de referência.');
+ if(nextTarv&&nextTarv<tarv)return fail('A próxima consulta TARV não pode ocorrer antes da consulta de referência.');
+ const base=addWeeks(tarv,12), actual=addWeeks(base,shift);
+ const labels={0:'Sem adiantamento ou atraso — 12 semanas','-1':'Adiantada 1 semana','-2':'Adiantada 2 semanas',1:'Atrasada 1 semana',2:'Atrasada 2 semanas',3:'Atrasada 3 semanas',4:'Atrasada 4 semanas'};
+ let h='<div class="banner blue"><div class="small">Utente sincronizada / DS e injectável no mesmo dia</div><div class="big">'+labels[shift]+'</div><div class="pill">Cenário A</div></div>';
+ h+=dateLine('Data programada da injecção intercalar',base,'12 semanas a partir da consulta TARV / DS.');
+ if(shift!==0)h+=dateLine('Data da injecção intercalar ajustada',actual,shift<0?'Adiantada em '+Math.abs(shift)+' semana'+(Math.abs(shift)>1?'s':'')+'.':'Atrasada em '+shift+' semana'+(shift>1?'s':'')+'.');
+ if(nextTarv){
+   h+=dateLine('Próxima consulta TARV',nextTarv,'Data introduzida pelo provedor.');
+   if(shift<=2)h+=dateLine('Reinjecção seguinte',nextTarv,'Realizar na próxima consulta TARV.');
+   else if(shift===3){const x=addWeeks(nextTarv,1);h+=dateLine('Reinjecção seguinte',x,'1 semana após a próxima consulta TARV.');h+=dateLine('Injecção intercalar seguinte',addWeeks(x,12),'12 semanas após esta reinjecção.');}
+   else{const x=addWeeks(nextTarv,2);h+=dateLine('Reinjecção seguinte',x,'2 semanas após a próxima consulta TARV.');h+=dateLine('Injecção intercalar seguinte',addWeeks(x,12),'12 semanas após esta reinjecção.');}
+ } else {
+   h+=row('Próxima consulta TARV','Dentro de 6 meses.');
+   h+=row('Reinjecção seguinte',shift<=2?'Na próxima consulta TARV.':(shift===3?'1 semana após a próxima consulta TARV.':'2 semanas após a próxima consulta TARV.'));
+ }
+ h+=row('Doses de injectável para levar para casa','<strong>2 doses</strong>');
+ output.innerHTML=h;resultCard.classList.add('show');
+}
+
+function runB(){
+ const last=parseDate(document.getElementById('bInjection').value),tarv=parseDate(document.getElementById('bTarv').value);
+ if(!last||!tarv)return fail('Introduza as duas datas.');
+ const days=diffDays(last,tarv);if(days<0)return fail('A última injecção deve acontecer antes da consulta TARV / levantamento de ARVs.');
+ const w=Math.floor(days/7);
+ let h='<div class="banner orange"><div class="small">Intervalo calculado</div><div class="big">'+intervalText(days)+'</div><div class="pill">Cenário B</div></div>';
+ if(w<=5){const next=addWeeks(last,15);h+=dateLine('Próxima reinjecção',next,'Contar 15 semanas desde a última injecção.');h+=row('2.ª reinjecção','Na próxima consulta TARV.');h+=dateLine('Próxima consulta TARV — referência',addMonths(tarv,6),'Em 6 meses; auto-injecção no mesmo dia.');h+=row('Doses de injectável para levar para casa','<strong>2 doses</strong>');}
+ else if(w>=6&&w<=9){const next=addWeeks(last,16);h+=dateLine('Próxima reinjecção',next,'Contar 16 semanas desde a última injecção.');h+='<div class="alert">⚠️ É importante cumprir rigorosamente esta data.</div>';h+=dateLine('Próxima consulta TARV / 2.ª reinjecção',addWeeks(next,16),'Contar 16 semanas desde a próxima reinjecção; auto-injecção no mesmo dia.');h+=row('Doses de injectável para levar para casa','<strong>2 doses</strong>');}
+ else if(w>=10&&w<=15){h+=dateLine('Próxima reinjecção',tarv,'Na consulta TARV indicada.');h+=dateLine('2.ª reinjecção',addWeeks(tarv,12),'Utente sincronizada: 12 semanas após a consulta TARV.');h+=dateLine('Próxima consulta TARV — referência',addMonths(tarv,6),'Em 6 meses; auto-injecção no mesmo dia.');h+=row('Doses de injectável para levar para casa','<strong>2 doses</strong>');}
+ else h+='<div class="stop">O intervalo calculado é superior a 15 semanas e não está coberto pela tabela fornecida.</div>';
+ output.innerHTML=h;resultCard.classList.add('show');
+}
+
+function runCD(s){
+ const p=s==='C'?'c':'d',isTarv=s==='C';
+ const arv=parseDate(document.getElementById(p+'Arv').value),inj=parseDate(document.getElementById(p+'Injection').value);
+ if(!arv||!inj)return fail('Introduza as duas datas.');
+ const days=diffDays(arv,inj);if(days<0)return fail('O levantamento de ARVs deve acontecer antes do início/reinjecção do injectável.');
+ const w=Math.floor(days/7);
+ let h='<div class="banner blue"><div class="small">Intervalo calculado</div><div class="big">'+intervalText(days)+'</div><div class="pill">Cenário '+s+' — '+(isTarv?'consulta TARV':'consulta SSR/PF')+'</div></div>';
+ if(w<=5){const next=addWeeks(inj,10);h+=dateLine('Próxima reinjecção',next,(isTarv?'Na consulta TARV':'Na consulta SSR/PF')+': contar 10 semanas desde a injecção actual.');h+=row('2.ª reinjecção','Na próxima consulta TARV.');h+=row('Próxima consulta TARV','Dentro de 6 meses / na data programada; auto-injecção no mesmo dia.');h+=row('Doses de injectável para levar para casa','<strong>2 doses</strong>');}
+ else if(w>=6&&w<=9){const next=addWeeks(inj,15);h+=dateLine('Próxima reinjecção',next,(isTarv?'Na consulta TARV':'Na consulta SSR/PF')+': contar 15 semanas desde a injecção actual.<br><strong>⚠️ Nesta consulta entregamos apenas uma dose!</strong>');h+=dateLine('2.ª reinjecção',addWeeks(next,15),'Na próxima consulta TARV: contar 15 semanas desde a última injecção.');h+=row('Próxima consulta TARV','Dentro de 6 meses / na data programada.');h+=row('Doses de injectável para levar para casa','<strong>1 dose nesta consulta</strong>');}
+ else if(w>=10&&w<=14){const nextTarv=addMonths(arv,6);h+=dateLine('Próxima consulta TARV — referência',nextTarv,'Calculada como 6 meses após o levantamento de ARVs.');h+=dateLine('Próxima reinjecção',nextTarv,'Na próxima consulta TARV.');h+=dateLine('2.ª reinjecção',addWeeks(nextTarv,12),'Utente sincronizada: 12 semanas após a consulta TARV.');h+=row('Doses de injectável para levar para casa','<strong>2 doses</strong>');}
+ else h+='<div class="stop">O intervalo calculado é de 15 semanas ou mais e não está coberto pela tabela fornecida.</div>';
+ output.innerHTML=h;resultCard.classList.add('show');
+}
+
+document.getElementById('calc').addEventListener('click',()=>{const s=scenario();if(!s)return fail('Seleccione primeiro a situação da utente.');if(s==='A')return runA();if(s==='B')return runB();return runCD(s);});
+
+document.getElementById('quickCalcBtn').addEventListener('click',()=>{
+ const d=parseDate(document.getElementById('qDate').value),w=parseInt(document.getElementById('qWeeks').value,10),r=document.getElementById('quickCalcResult');
+ if(!d||Number.isNaN(w)||w<0||w>52){r.textContent='Introduza uma data válida e um número de semanas entre 0 e 52.';return;}
+ r.innerHTML='<strong>Data calculada da última injecção:</strong> '+fmt(addWeeks(d,-w))+' ('+w+' semana'+(w===1?'':'s')+' antes).';
+});
+</script>
+</body>
+</html>
